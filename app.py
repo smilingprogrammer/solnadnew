@@ -7,6 +7,11 @@ import torch
 
 from ultralytics import YOLO
 
+@st.cache_resource
+def load_model():
+    """Load and cache the YOLO model."""
+    return YOLO('best.pt')
+
 def main():
     """
     Main function for the Streamlit app.
@@ -43,7 +48,7 @@ def main():
         else:
             st.warning("Please upload an image.")
 
-    model = YOLO('best.pt')
+    model = load_model()
 
     if st.sidebar.button('Detect Objects'):
         if not source_img:
@@ -54,7 +59,7 @@ def main():
             res[0].boxes = filtered_boxes
             res_plotted = res[0].plot()[:, :, ::-1]
             with col2:
-                st.image(res_plotted, caption='Detected Image',use_column_width=True)
+                st.image(res_plotted, caption='Detected Image',use_container_width=True)
                 # Count detected objects and display counts
                 object_counts = helper.count_detected_objects(model, filtered_boxes)
                 st.write("\n\nDetected Objects and their Counts:")
